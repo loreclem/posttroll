@@ -23,7 +23,9 @@
 """Tests package.
 """
 
-from posttroll.tests import test_bbmcast, test_message, test_pubsub
+from posttroll.tests import test_bbmcast
+from posttroll.tests import test_message
+from posttroll.tests import test_pubsub
 import unittest
 
 def suite():

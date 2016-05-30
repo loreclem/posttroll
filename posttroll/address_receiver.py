@@ -120,6 +120,7 @@ class AddressReceiver(object):
 
         LOGGER.debug("%s - checking addresses", str(datetime.utcnow()) )
         self._last_age_check = now
+        to_del = []
         with self._address_lock:
             for addr, metadata in self._addresses.items():
                 atime = metadata["receive_time"]
@@ -128,9 +129,11 @@ class AddressReceiver(object):
                            'URI': addr,
                            'service': metadata['service']}
                     msg = Message('/address/' + metadata['name'], 'info', mda)
-                    del self._addresses[addr]
+                    to_del.append(addr)
                     LOGGER.info("publish remove '%s'", str(msg))
                     pub.send(msg.encode())
+            for addr in to_del:
+                del self._addresses[addr]
 
     def _run(self):
         """Run the receiver.
@@ -213,8 +216,8 @@ class _SimpleReceiver(object):
         self._socket.bind("tcp://*:" + str(port))
 
     def __call__(self):
-        message = self._socket.recv()
-        self._socket.send("ok")
+        message = self._socket.recv_string()
+        self._socket.send_string("ok")
         return message, None
 
     def close(self):

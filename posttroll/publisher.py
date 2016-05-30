@@ -23,7 +23,8 @@
 
 """The publisher module gives high-level tools to publish messages on a port.
 """
-from urlparse import urlsplit, urlunsplit
+from six.moves.urllib.parse import urlsplit, urlunsplit
+import six
 from datetime import datetime, timedelta
 import zmq
 from posttroll import context
@@ -118,7 +119,7 @@ class Publisher(object):
     def send(self, msg):
         """Send the given message.
         """
-        self.publish.send(msg)
+        self.publish.send_string(msg)
         return self
 
     def stop(self):
@@ -177,7 +178,7 @@ class NoisyPublisher(object):
         self._name = name
         self._aliases = [name]
         if aliases:
-            if isinstance(aliases, (str, unicode)):
+            if isinstance(aliases, (str, six.text_type)):
                 self._aliases += [aliases]
             else:
                 self._aliases += aliases

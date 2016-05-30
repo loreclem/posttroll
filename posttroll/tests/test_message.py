@@ -65,11 +65,10 @@ class Test(unittest.TestCase):
     def test_decode(self):
         """Test the decoding of a message.
         """
-        rawstr = (_MAGICK + 
-                  '/test/1/2/3 info ras@hawaii 2008-04-11T22:13:22.123000 v1.01'
-                  + ' application/json "what\'s up doc"')
+        rawstr = (_MAGICK +
+                  r'/test/1/2/3 info ras@hawaii 2008-04-11T22:13:22.123000 v1.01'
+                  + r' text/ascii "what' + r"'" + r's up doc"')
         msg = Message.decode(rawstr)
-
         self.assertTrue(str(msg) == rawstr,
                         msg='Messaging, decoding of message failed')
 
@@ -81,15 +80,15 @@ class Test(unittest.TestCase):
         data = 'not much to say'
         msg1 = Message(subject, atype, data=data)
         sender = '%s@%s' % (msg1.user, msg1.host)
-        self.assertEquals(_MAGICK +
-                          subject + " " +
-                          atype + " " +
-                          sender + " " +
-                          str(msg1.time.isoformat()) + " " +
-                          msg1.version + " "
-                          + 'text/ascii' + " " +
-                          data,
-                          msg1.encode())
+        self.assertEqual(_MAGICK +
+                         subject + " " +
+                         atype + " " +
+                         sender + " " +
+                         str(msg1.time.isoformat()) + " " +
+                         msg1.version + " "
+                         + 'text/ascii' + " " +
+                         data,
+                         msg1.encode())
 
     def test_pickle(self):
         """Test pickling.
@@ -97,10 +96,10 @@ class Test(unittest.TestCase):
         import pickle
         msg1 = Message('/test/whatup/doc', 'info', data='not much to say')
         try:
-            fp_ = open("pickle.message", 'w')
+            fp_ = open("pickle.message", 'wb')
             pickle.dump(msg1, fp_)
             fp_.close()
-            fp_ = open("pickle.message")
+            fp_ = open("pickle.message", 'rb')
             msg2 = pickle.load(fp_)
 
             fp_.close()
@@ -140,11 +139,11 @@ class Test(unittest.TestCase):
 
         msg = json.loads(dump)
         for key, val in msg.items():
-            self.assertEquals(val, metadata.get(key))
+            self.assertEqual(val, metadata.get(key))
 
         msg = json.loads(local_dump)
         for key, val in msg.items():
-            self.assertEquals(val, metadata.get(key))
+            self.assertEqual(val, metadata.get(key))
 
 def suite():
     """The suite for test_message.

@@ -83,13 +83,13 @@ def get_pub_address(name, timeout=10, nameserver="localhost"):
         poller.register(socket, POLLIN)
 
         message = Message("/oper/ns", "request", {"service": name})
-        socket.send(str(message))
+        socket.send_string(str(message))
 
         # Get the reply.
         sock = poller.poll(timeout=timeout * 1000)
         if sock:
             if sock[0][0] == socket:
-                message = Message.decode(socket.recv(NOBLOCK))
+                message = Message.decode(socket.recv_string(NOBLOCK))
                 return message.data
         else:
             raise TimeoutError("Didn't get an address after %d seconds."
@@ -139,7 +139,7 @@ class NameServer(object):
                 socks = dict(poller.poll(1000))
                 if socks:
                     if socks.get(self.listener) == POLLIN:
-                        msg = self.listener.recv()
+                        msg = self.listener.recv_string()
                 else:
                     continue
                 logger.debug("Replying to request: " + str(msg))

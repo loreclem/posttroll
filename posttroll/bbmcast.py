@@ -64,7 +64,7 @@ class MulticastSender(object):
         self.socket, self.group = mcast_sender(mcgroup)
 
     def __call__(self, data):
-        self.socket.sendto(data, (self.group, self.port))
+        self.socket.sendto(data.encode(), (self.group, self.port))
 
     def close(self):
         """Close the sender.
@@ -117,7 +117,7 @@ class MulticastReceiver(object):
 
     def __call__(self):
         data, sender = self.socket.recvfrom(self.BUFSIZE)
-        return data, sender
+        return data.decode(), sender
 
     def close(self):
         """Close the receiver.

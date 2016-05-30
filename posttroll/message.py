@@ -39,6 +39,8 @@ Note: It's not optimized for BIG messages.
 import re
 from datetime import datetime
 import _strptime
+
+import six
 try:
     import json
 except ImportError:
@@ -66,19 +68,19 @@ class MessageError(Exception):
 def is_valid_subject(obj):
     """Currently we only check for empty strings.
     """
-    return isinstance(obj, (str, unicode)) and bool(obj)
+    return isinstance(obj, (str, six.text_type)) and bool(obj)
 
 
 def is_valid_type(obj):
     """Currently we only check for empty strings.
     """
-    return isinstance(obj, (str, unicode)) and bool(obj)
+    return isinstance(obj, (str, six.text_type)) and bool(obj)
 
 
 def is_valid_sender(obj):
     """Currently we only check for empty strings.
     """
-    return isinstance(obj, (str, unicode)) and bool(obj)
+    return isinstance(obj, (str, six.text_type)) and bool(obj)
 
 
 def is_valid_data(obj):
@@ -215,7 +217,7 @@ def datetime_decoder(dct):
         pairs = dct.items()
     result = []
     for key, val in pairs:
-        if isinstance(val, basestring):
+        if isinstance(val, six.string_types):
             try:
                 val = strp_isoformat(val)
             except ValueError:
@@ -294,11 +296,13 @@ def datetime_encoder(obj):
 def _encode(msg, head=False, binary=False):
     """Convert a Message to a raw string.
     """
-    rawstr = _MAGICK + "%s %s %s %s %s" % \
-        (msg.subject, msg.type, msg.sender,
-         msg.time.isoformat(), msg.version)
+    rawstr = str(_MAGICK) + "{0:s} {1:s} {2:s} {3:s} {4:s}".format(msg.subject,
+                                                              msg.type,
+                                                              msg.sender,
+                                                              msg.time.isoformat(),
+                                                              msg.version)
     if not head and msg.data:
-        if not binary and isinstance(msg.data, str):
+        if not binary and isinstance(msg.data, (str, six.text_type)):
             return (rawstr + ' ' +
                     'text/ascii' + ' ' + msg.data)
         elif not binary:
